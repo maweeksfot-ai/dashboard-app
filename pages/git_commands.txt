@@ -1,0 +1,45 @@
+
+# merge dev branch with main 
+
+git checkout main
+git pull        # get latest main
+git merge dev
+git push
+
+# checkout or create branch 
+
+git checkout -b [inset brnach name] 
+git branch 
+
+
+# add specific files 
+
+git add requirements.txt
+git commit -m "Add openpyxl for Excel support"
+git push
+
+# fix incorrect origin setting
+
+git remote set-url origin git@github.com:USERNAME/correct-repo.git
+
+# check current remote repo 
+
+git remote -v
+
+# check status of repo 
+
+git remote -v 
+
+# make a new repo 
+
+mkdir [insert name]
+cd [new repo]
+git init 
+** add files ** 
+git branch -M main
+
+Go to github and create repo with name 
+
+git remote add origin git@github.com:YOUR_USERNAME/my-first-repo.git
+
+git push -u origin main
