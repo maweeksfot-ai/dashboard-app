@@ -6,8 +6,7 @@ pandas
 streamlit
 sys
 os
-pandas as pd
-numpy as np 
+numpy 
 math
 io
 
