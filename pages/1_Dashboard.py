@@ -44,7 +44,7 @@ st.divider()
 
 def get_data(url, ttl=1800):
     response = requests.get(url)
-    df = pd.read_excel(BytesIO(response.content))
+    df = pd.read_excel(BytesIO(response.content), engine="openpyxl")
     # df = pd.read_csv(fd, sep='\t', header=None, skip_blank_lines=True)
     df = df.replace(',', '', regex=True)
     df = df.dropna(how="all")
