@@ -1,0 +1,13 @@
+streamlit-lottie
+requests
+json
+PIL
+pandas
+streamlit
+sys
+os
+pandas as pd
+numpy as np 
+math
+io
+
