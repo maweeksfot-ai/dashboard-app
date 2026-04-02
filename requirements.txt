@@ -1,12 +1,7 @@
+streamlit
 streamlit-lottie
 requests
-json
-PIL
 pandas
-streamlit
-sys
-os
-numpy 
-math
-io
+numpy
+Pillow
 
