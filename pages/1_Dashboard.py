@@ -170,7 +170,7 @@ df1, df2 = make_request(test_data_url_1, test_data_url_2)
 latest_row1 = df1.iloc[-1, :51]
 latest_row2 = df2.iloc[-1, :59]
 
-last_reading = latest_row1[2]
+last_reading = latest_row1.iloc[2]
 # Parse wells
 wells1 = parse_wells_from_row(latest_row1)
 wells2 = parse_wells_from_row(latest_row2, start_id=len(wells1) + 1)
