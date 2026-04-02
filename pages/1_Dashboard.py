@@ -304,6 +304,8 @@ for i in range(0, len(wells_list), COLS):
                         key=f"lottie_{well.well_id}"
                     )
 
+                gpm_is_percent = False
+                  
                 if gpm is None:
                     pass
                 else:
