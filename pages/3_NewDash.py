@@ -5,9 +5,15 @@ import pandas as pd
 from io import BytesIO
 import streamlit as st
 from datetime import datetime, time
+import altair as alt
 
+st.set_page_config(layout="wide")
 
 sys.path.append(os.path.join(os.getcwd(), "..", "data"))
+
+live_urls = [ "https://1drv.ms/x/c/d6aca2526f83594b/IQAMcIopdLU9SINiVRsgBHwWAZsXQJ5-PHSv1BevGvZ8f0Q?download=1",
+              "https://1drv.ms/x/c/d6aca2526f83594b/IQAlE6FfCDS_QL0HXfdxWdtCAae3Ilx-a_K9hA_PXGN3Ofs?download=1"
+               ]
 
 urls = [ "https://1drv.ms/x/c/f6261b79731e452c/IQBpBPUwwVtQTYrz4LgAWE6ZAfTxxxhud5AzyDm4tVY5P-0?download=1",   # Dirty 1 - 24
          "https://1drv.ms/x/c/f6261b79731e452c/IQDTm4wgClDgRKutu40S_fAUASzQrkvm2Z--Qe2whPBX1xI?download=1"
@@ -61,6 +67,7 @@ def drop_DT(df):
     df = df.drop(columns=['Date', 'Time'], errors='ignore')
     return df
 
+@st.cache_data(ttl=3600)
 def merge_and_sort(df1, df2):
     df_merged = pd.merge(df1, df2, on='datetime', how='outer', suffixes=('_1', '_2'))
     df_merged.sort_values('datetime', inplace=True)
@@ -68,6 +75,37 @@ def merge_and_sort(df1, df2):
     df_merged = df_merged.drop(columns=['comments_1', 'comments_2'], errors='ignore')
     return df_merged
 
+@st.cache_data(ttl=3600)
+def make_tidy(df):
+
+    value_cols = [col for col in df.columns if 'GPM_' in col or 'TOTAL_GAL_' in col]
+
+    df_long = df.melt(
+        id_vars='datetime',
+        value_vars=value_cols,
+        var_name='variable',
+        value_name='value'
+    )
+
+    # split column names
+    df_long[['metric', 'pump']] = df_long['variable'].str.extract(r'(GPM|TOTAL_GAL)_(\d+)')
+    df_long['pump'] = df_long['pump'].astype(int)
+
+    # 🔑 FIX: force numeric
+    df_long['value'] = pd.to_numeric(df_long['value'], errors='coerce')
+
+    # 🔑 apply rule: GPM < 1 → 0
+    df_long.loc[(df_long['metric'] == 'GPM') & (df_long['value'] < 1),'value'] = 0
+    # pivot
+    df_tidy = df_long.pivot_table(
+        index=['datetime', 'pump'],
+        columns='metric',
+        values='value'
+    ).reset_index()
+    df_tidy.columns.name = None
+    return df_tidy
+
+@st.cache_data(ttl=3600)
 def run_functions(url, list):
     df = get_data(url)
     df = shape_df(df)
@@ -77,238 +115,153 @@ def run_functions(url, list):
     df = make_datetime_col(df)
     df = fix_space(df)
     df = drop_DT(df)
+    print("The functions ran ....")
     return df
 
-df1 = run_functions(urls[0], col)
-df2 = run_functions(urls[1], col2)
-
-st.cache_data(ttl=3600)
-df_combined = merge_and_sort(df1, df2)
-
-st.dataframe(df_combined)
-# loop to make columns and rows 
-
-pump = st.selectbox("Select Pump", [1,2,3,4,5])  # expand later
-
-st.line_chart(
-    df_combined.set_index('datetime')[f'GPM_{pump}']
-)
-
-
-# # gpm_cols = [col for col in df_combined.columns if 'GPM_' in col]
-
-# # df_combined['total_GPM'] = df_combined[gpm_cols].sum(axis=1)
-
-# # st.line_chart(df_combined.set_index('datetime')['total_GPM'])
-
-
-
-
-# # df_combined['Pump1_running'] = df_combined['GPM_1'] > 0
-
-# # runtime = df_combined['Pump1_running'].sum()
-# # st.write(f"Pump 1 runtime (rows): {runtime}")
-
-
-
-
-# # runtime_pct = (df_combined['GPM_1'] > 0).mean() * 100
-# # st.write(f"Pump 1 runtime: {runtime_pct:.2f}%")
-
-
-
-
-
-
-
-# df_daily = (
-#     df_combined
-#     .set_index('datetime')
-#     .select_dtypes(include='number')
-#     .resample('D')
-#     .sum()
-# )
-
-# st.line_chart(df_daily['total_GPM'])
-
-
-
-
-
-
-# pump_totals = {
-#     col: df_combined[col].sum()
-#     for col in df_combined.columns if 'GPM_' in col
-# }
-
-# st.bar_chart(pd.Series(pump_totals))
-
-
-
-
-
-# #### spikes 
-# threshold = df_combined['GPM_1'].mean() + 3 * df_combined['GPM_1'].std()
-
-# spikes = df_combined[df_combined['GPM_1'] > threshold]
-
-# st.write(spikes)
-
-
-
-
-
-# # rate of change 
-# df_combined['GPM_1_diff'] = df_combined['GPM_1'].diff()
-
-# st.line_chart(df_combined.set_index('datetime')['GPM_1_diff'])
-
-# for i in range(13):  # 13 rows
-#     cols = st.columns(4)  # 4 columns
-    
-#     for j in range(4):
-#         with cols[j]:
-#             st.container().write(f"Row {i+1}, Col {j+1}")  # make this a function call
-
-
-import pandas as pd
-import streamlit as st
-
-# =========================
-# 🔹 CLEAN NUMERIC COLUMNS
-# =========================
-def clean_numeric(df):
-    pump_cols = [col for col in df.columns if 'GPM_' in col or 'TOTAL_GAL_' in col]
-    
-    # Convert everything to numeric safely
-    df[pump_cols] = df[pump_cols].apply(pd.to_numeric, errors='coerce')
-    
-    return df, pump_cols
-
-
-# =========================
-# 🔹 ADD TOTAL GPM
-# =========================
-def add_total_gpm(df, pump_cols):
-    gpm_cols = [col for col in pump_cols if 'GPM_' in col]
-    
-    df['total_GPM'] = df[gpm_cols].sum(axis=1)
-    
-    return df
-
-
-# =========================
-# 🔹 DAILY AGGREGATION
-# =========================
-def get_daily(df):
-    df_daily = (
-        df
-        .set_index('datetime')
-        .select_dtypes(include='number')  # avoid string errors
-        .resample('D')
-        .sum()
+@st.cache_data(ttl=3600)
+def get_daily_volume(df_tidy):
+    df_tidy['date'] = df_tidy['datetime'].dt.date
+    daily_total = (
+        df_tidy.groupby(['date', 'pump'])['TOTAL_GAL']
+        .agg(day_start='first', day_end='last')
+        .reset_index()
     )
-    return df_daily
+    daily_total['daily_volume'] = (daily_total['day_end'] - daily_total['day_start']).clip(lower=0)
+    return daily_total
+
+@st.cache_data(ttl=3600)
+def get_weekly_volume(df_tidy):
+    # Ensure datetime is datetime type
+    df_tidy['datetime'] = pd.to_datetime(df_tidy['datetime'])
+    # Group by pump and week
+    weekly_total = (
+        df_tidy.groupby(['pump', pd.Grouper(key='datetime', freq='W')])['TOTAL_GAL']
+        .agg(day_start='first', day_end='last')
+        .reset_index()
+    )
+    # Actual pumped volume = last - first
+    weekly_total['weekly_volume'] = (weekly_total['day_end'] - weekly_total['day_start']).clip(lower=0)
+    return weekly_total
+def main():
+
+    df1 = run_functions(live_urls[0], col)
+    df2 = run_functions(live_urls[1], col2)
 
 
-# =========================
-# 🔹 PUMP RUNTIME %
-# =========================
-def get_runtime(df, pump_cols):
-    runtime = {}
-    
-    for col in pump_cols:
-        if 'GPM_' in col:
-            runtime[col] = (df[col] > 0).mean() * 100
-    
-    return pd.Series(runtime).sort_values(ascending=False)
+    df_combined = merge_and_sort(df1, df2)
+    df_tidy = make_tidy(df_combined)
+
+    st.write(df_tidy.info())
+    print(df_tidy.info())
+    # st.dataframe(df_tidy)
+    st.header("Total Gallons By Pump")
+    pump = st.selectbox("Select Pump", sorted(df_tidy['pump'].unique()))
+    filtered = df_tidy[df_tidy['pump'] == pump]
+    st.line_chart(filtered.set_index('datetime')['TOTAL_GAL'])
 
 
-# =========================
-# 🔹 PUMP TOTAL USAGE
-# =========================
-def get_totals(df, pump_cols):
-    totals = {}
-    
-    for col in pump_cols:
-        if 'GPM_' in col:
-            totals[col] = df[col].sum()
-    
-    return pd.Series(totals).sort_values(ascending=False)
+    # calculate daily pumped volume from cumulative readings
+    # ensure datetime is actually datetime type
+    # make sure datetime
+    df_tidy['datetime'] = pd.to_datetime(df_tidy['datetime'])
+    df_tidy['date'] = df_tidy['datetime'].dt.date
+
+    pump_id = 1  # choose the pump you want
+    df_pump = df_tidy[df_tidy['pump'] == pump_id].copy()
+    df_pump['datetime'] = pd.to_datetime(df_pump['datetime'])
+
+    # Set datetime as index for resampling
+    df_pump.set_index('datetime', inplace=True)
+
+    # Resample by week, get first and last cumulative values
+    weekly = df_pump['TOTAL_GAL'].resample('W').agg(['first', 'last'])
+    # Actual pumped volume
+    weekly['weekly_volume'] = (weekly['last'] - weekly['first']).clip(lower=0)
+    weekly = weekly.reset_index()
+
+    bar_chart = alt.Chart(weekly).mark_bar().encode(
+        x='datetime:T',
+        y='weekly_volume:Q',
+        tooltip=['datetime', 'weekly_volume']
+    )
+
+    st.altair_chart(bar_chart, use_container_width=True)
+
+    line_chart = alt.Chart(weekly).mark_line(point=True).encode(
+        x='datetime:T',           # time on x-axis
+        y='weekly_volume:Q',      # pumped volume on y-axis
+        tooltip=['datetime', 'weekly_volume']).properties(title=f'Weekly Pumped Volume for Pump {pump_id}').interactive()  # allows zoom/pan
+
+    st.altair_chart(line_chart, use_container_width=True)
 
 
-# =========================
-# 🔹 SPIKE DETECTION
-# =========================
-def get_spikes(df, pump_col):
-    mean = df[pump_col].mean()
-    std = df[pump_col].std()
-    
-    threshold = mean + 3 * std
-    
-    spikes = df[df[pump_col] > threshold]
-    
-    return spikes
 
 
-# =========================
-# 🔹 MAIN PIPELINE
-# =========================
-def run_analysis(df_combined):
 
-    # Ensure datetime is correct
-    df_combined['datetime'] = pd.to_datetime(df_combined['datetime'])
+    df_tidy['datetime'] = pd.to_datetime(df_tidy['datetime'])
 
-    # Clean numeric columns
-    df_combined, pump_cols = clean_numeric(df_combined)
+    # Set datetime as index
+    df_tidy_indexed = df_tidy.set_index('datetime')
 
-    # Fill NaNs (important since pumps come online at different times)
-    df_combined[pump_cols] = df_combined[pump_cols].fillna(0)
+    # Group by pump and resample weekly
+    weekly = (
+        df_tidy_indexed.groupby('pump')['TOTAL_GAL']
+        .resample('W')  # weekly frequency
+        .agg(first='first', last='last')
+        .reset_index()  # bring 'pump' back as column
+    )
 
-    # Add total GPM
-    df_combined = add_total_gpm(df_combined, pump_cols)
-
-    # Daily aggregation
-    df_daily = get_daily(df_combined)
-
-    # Runtime + totals
-    runtime = get_runtime(df_combined, pump_cols)
-    totals = get_totals(df_combined, pump_cols)
-
-    return df_combined, df_daily, runtime, totals
+    # Compute actual weekly pumped volume
+    weekly['weekly_volume'] = (weekly['last'] - weekly['first']).clip(lower=0)
 
 
-# =========================
-# 🔹 STREAMLIT UI
-# =========================
-df_combined, df_daily, runtime, totals = run_analysis(df_combined)
+    pump_options = sorted(df_tidy['pump'].unique())
+    selected_pumps = st.multiselect("Select Pumps", pump_options, default=[pump_options[0]])
 
-st.title("Pump Dashboard")
+    weekly_filtered = weekly[weekly['pump'].isin(selected_pumps)]
 
-# ---- Total System Flow ----
-st.subheader("Total System GPM Over Time")
-st.line_chart(df_combined.set_index('datetime')['total_GPM'])
+    line_chart = alt.Chart(weekly_filtered).mark_line(point=True).encode(
+        x='datetime:T',
+        y='weekly_volume:Q',
+        color='pump:N',
+        tooltip=['pump', 'datetime', 'weekly_volume']
+    ).interactive()
 
-# ---- Daily Total ----
-st.subheader("Daily Total GPM")
-st.line_chart(df_daily['total_GPM'])
+    st.altair_chart(line_chart, use_container_width=True)
+    # # =========================
+    # # 🔹 STREAMLIT UI
+    # # =========================
+    # df_combined, df_daily, runtime, totals = run_analysis(df_combined)
 
-# ---- Pump Selection ----
-gpm_cols = [col for col in df_combined.columns if 'GPM_' in col]
-pump = st.selectbox("Select Pump", gpm_cols)
+    # st.title("Pump Dashboard")
 
-st.subheader(f"{pump} Over Time")
-st.line_chart(df_combined.set_index('datetime')[pump])
+    # # ---- Total System Flow ----
+    # st.subheader("Total System GPM Over Time")
+    # st.line_chart(df_combined.set_index('datetime')['total_GPM'])
 
-# ---- Runtime ----
-st.subheader("Pump Runtime %")
-st.bar_chart(runtime)
+    # # ---- Daily Total ----
+    # st.subheader("Daily Total GPM")
+    # st.line_chart(df_daily['total_GPM'])
 
-# ---- Total Usage ----
-st.subheader("Pump Total Usage")
-st.bar_chart(totals)
+    # # ---- Pump Selection ----
+    # gpm_cols = [col for col in df_combined.columns if 'GPM_' in col]
+    # pump = st.selectbox("Select Pump", gpm_cols)
 
-# ---- Spikes ----
-st.subheader("Spike Detection")
-spikes = get_spikes(df_combined, pump)
-st.write(spikes)
+    # st.subheader(f"{pump} Over Time")
+    # st.line_chart(df_combined.set_index('datetime')[pump])
+
+    # # ---- Runtime ----
+    # st.subheader("Pump Runtime %")
+    # st.bar_chart(runtime)
+
+    # # ---- Total Usage ----
+    # st.subheader("Pump Total Usage")
+    # st.bar_chart(totals)
+
+    # # ---- Spikes ----
+    # st.subheader("Spike Detection")
+    # spikes = get_spikes(df_combined, pump)
+    # st.write(spikes)
+
+
+main()
