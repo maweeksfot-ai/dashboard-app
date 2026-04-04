@@ -46,6 +46,17 @@ print(df1["GPM.1"], df2["GPM.1"])
 
 # once the df are normalized you can beign counting the number if new rows that need to be added to the data base. 
 
+# Helper function for generating containers 
+
+import streamlit as st 
+
+for i in range(13):  # 13 rows
+    cols = st.columns(4)  # 4 columns
+    
+    for j in range(4):
+        with cols[j]:
+            st.container().write(f"Row {i+1}, Col {j+1}")
+
 
 
 
