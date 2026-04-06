@@ -19,10 +19,9 @@ urls = [ "https://1drv.ms/x/c/f6261b79731e452c/IQBpBPUwwVtQTYrz4LgAWE6ZAfTxxxhud
          "https://1drv.ms/x/c/f6261b79731e452c/IQDTm4wgClDgRKutu40S_fAUASzQrkvm2Z--Qe2whPBX1xI?download=1"
          ]   # Dirty 25 - 107 
 
-col = ['Date', 'Time', 'GPM_1', 'TOTAL_GAL_1', 'GPM_2','TOTAL_GAL_2', 'GPM_3', 'TOTAL_GAL_3', 'GPM_4', 'TOTAL_GAL_4', 'GPM_5','TOTAL_GAL_5', 'GPM_6', 'TOTAL_GAL_6', 'GPM_7', 'TOTAL_GAL_7', 'GPM_8','TOTAL_GAL_8', 'GPM_9', 'TOTAL_GAL_9', 'GPM_10', 'TOTAL_GAL_10', 'GPM_11','TOTAL_GAL_11', 'GPM_12', 'TOTAL_GAL_12', 'GPM_13', 'TOTAL_GAL_13','GPM_14', 'TOTAL_GAL_14', 'GPM_15', 'TOTAL_GAL_15', 'GPM_16','TOTAL_GAL_16', 'GPM_17', 'TOTAL_GAL_17', 'GPM_18', 'TOTAL_GAL_18','GPM_19', 'TOTAL_GAL_19', 'GPM_20', 'TOTAL_GAL_20', 'GPM_21','TOTAL_GAL_21', 'GPM_22', 'TOTAL_GAL_22', 'GPM_23', 'TOTAL_GAL_23','GPM_24', 'TOTAL_GAL_24', 'comments', 'datetime']
-col2 = ['Date', 'Time','GPM_25', 'TOTAL_GAL_25', 'GPM_26','TOTAL_GAL_26','GPM_27', 'TOTAL_GAL_27', 'GPM_28','TOTAL_GAL_28', 'GPM_29', 'TOTAL_GAL_29', 'GPM_30','TOTAL_GAL_30', 'GPM_31', 'TOTAL_GAL_31', 'GPM_32', 'TOTAL_GAL_32', 'GPM_33','TOTAL_GAL_33', 'GPM_34', 'TOTAL_GAL_34', 'GPM_35', 'TOTAL_GAL_35', 'GPM_36','TOTAL_GAL_36', 'GPM_37', 'TOTAL_GAL_37', 'GPM_38', 'TOTAL_GAL_38', 'GPM_39','TOTAL_GAL_39', 'GPM_40', 'TOTAL_GAL_40', 'GPM_41', 'TOTAL_GAL_41','GPM_42', 'TOTAL_GAL_42', 'GPM_43', 'TOTAL_GAL_43', 'GPM_44','TOTAL_GAL_44', 'GPM_45', 'TOTAL_GAL_45', 'GPM_101', 'TOTAL_GAL_101','GPM_102', 'TOTAL_GAL_102', 'GPM_103', 'TOTAL_GAL_103', 'GPM_104','TOTAL_GAL_104', 'GPM_105', 'TOTAL_GAL_105', 'GPM_106', 'TOTAL_GAL_106','GPM_107', 'TOTAL_GAL_107', 'comments', 'datetime']
+columns1 = ['Date', 'Time', 'GPM_1', 'TOTAL_GAL_1', 'GPM_2','TOTAL_GAL_2', 'GPM_3', 'TOTAL_GAL_3', 'GPM_4', 'TOTAL_GAL_4', 'GPM_5','TOTAL_GAL_5', 'GPM_6', 'TOTAL_GAL_6', 'GPM_7', 'TOTAL_GAL_7', 'GPM_8','TOTAL_GAL_8', 'GPM_9', 'TOTAL_GAL_9', 'GPM_10', 'TOTAL_GAL_10', 'GPM_11','TOTAL_GAL_11', 'GPM_12', 'TOTAL_GAL_12', 'GPM_13', 'TOTAL_GAL_13','GPM_14', 'TOTAL_GAL_14', 'GPM_15', 'TOTAL_GAL_15', 'GPM_16','TOTAL_GAL_16', 'GPM_17', 'TOTAL_GAL_17', 'GPM_18', 'TOTAL_GAL_18','GPM_19', 'TOTAL_GAL_19', 'GPM_20', 'TOTAL_GAL_20', 'GPM_21','TOTAL_GAL_21', 'GPM_22', 'TOTAL_GAL_22', 'GPM_23', 'TOTAL_GAL_23','GPM_24', 'TOTAL_GAL_24', 'comments', 'datetime']
+columns2 = ['Date', 'Time','GPM_25', 'TOTAL_GAL_25', 'GPM_26','TOTAL_GAL_26','GPM_27', 'TOTAL_GAL_27', 'GPM_28','TOTAL_GAL_28', 'GPM_29', 'TOTAL_GAL_29', 'GPM_30','TOTAL_GAL_30', 'GPM_31', 'TOTAL_GAL_31', 'GPM_32', 'TOTAL_GAL_32', 'GPM_33','TOTAL_GAL_33', 'GPM_34', 'TOTAL_GAL_34', 'GPM_35', 'TOTAL_GAL_35', 'GPM_36','TOTAL_GAL_36', 'GPM_37', 'TOTAL_GAL_37', 'GPM_38', 'TOTAL_GAL_38', 'GPM_39','TOTAL_GAL_39', 'GPM_40', 'TOTAL_GAL_40', 'GPM_41', 'TOTAL_GAL_41','GPM_42', 'TOTAL_GAL_42', 'GPM_43', 'TOTAL_GAL_43', 'GPM_44','TOTAL_GAL_44', 'GPM_45', 'TOTAL_GAL_45', 'GPM_101', 'TOTAL_GAL_101','GPM_102', 'TOTAL_GAL_102', 'GPM_103', 'TOTAL_GAL_103', 'GPM_104','TOTAL_GAL_104', 'GPM_105', 'TOTAL_GAL_105', 'GPM_106', 'TOTAL_GAL_106','GPM_107', 'TOTAL_GAL_107', 'comments', 'datetime']
 
-st.cache_data(ttl=3600)
 def get_data(url):
     response = requests.get(url)
     df = pd.read_excel(BytesIO(response.content), engine="openpyxl")
@@ -67,7 +66,7 @@ def drop_DT(df):
     df = df.drop(columns=['Date', 'Time'], errors='ignore')
     return df
 
-@st.cache_data(ttl=3600)
+@st.cache_data()
 def merge_and_sort(df1, df2):
     df_merged = pd.merge(df1, df2, on='datetime', how='outer', suffixes=('_1', '_2'))
     df_merged.sort_values('datetime', inplace=True)
@@ -75,7 +74,7 @@ def merge_and_sort(df1, df2):
     df_merged = df_merged.drop(columns=['comments_1', 'comments_2'], errors='ignore')
     return df_merged
 
-@st.cache_data(ttl=3600)
+@st.cache_data()
 def make_tidy(df):
 
     value_cols = [col for col in df.columns if 'GPM_' in col or 'TOTAL_GAL_' in col]
@@ -105,7 +104,7 @@ def make_tidy(df):
     df_tidy.columns.name = None
     return df_tidy
 
-@st.cache_data(ttl=3600)
+@st.cache_data()
 def run_functions(url, list):
     df = get_data(url)
     df = shape_df(df)
@@ -118,7 +117,7 @@ def run_functions(url, list):
     print("The functions ran ....")
     return df
 
-@st.cache_data(ttl=3600)
+@st.cache_data()
 def get_daily_volume(df_tidy):
     df_tidy['date'] = df_tidy['datetime'].dt.date
     daily_total = (
@@ -129,7 +128,7 @@ def get_daily_volume(df_tidy):
     daily_total['daily_volume'] = (daily_total['day_end'] - daily_total['day_start']).clip(lower=0)
     return daily_total
 
-@st.cache_data(ttl=3600)
+@st.cache_data()
 def get_weekly_volume(df_tidy):
     # Ensure datetime is datetime type
     df_tidy['datetime'] = pd.to_datetime(df_tidy['datetime'])
@@ -142,17 +141,17 @@ def get_weekly_volume(df_tidy):
     # Actual pumped volume = last - first
     weekly_total['weekly_volume'] = (weekly_total['day_end'] - weekly_total['day_start']).clip(lower=0)
     return weekly_total
+
+
 def main():
 
-    df1 = run_functions(live_urls[0], col)
-    df2 = run_functions(live_urls[1], col2)
-
+    df1 = run_functions(live_urls[0], columns1)
+    df2 = run_functions(live_urls[1], columns2)
 
     df_combined = merge_and_sort(df1, df2)
     df_tidy = make_tidy(df_combined)
 
-    st.write(df_tidy.info())
-    print(df_tidy.info())
+
     # st.dataframe(df_tidy)
     st.header("Total Gallons By Pump")
     pump = st.selectbox("Select Pump", sorted(df_tidy['pump'].unique()))
@@ -160,74 +159,70 @@ def main():
     st.line_chart(filtered.set_index('datetime')['TOTAL_GAL'])
 
 
-    # calculate daily pumped volume from cumulative readings
-    # ensure datetime is actually datetime type
-    # make sure datetime
-    df_tidy['datetime'] = pd.to_datetime(df_tidy['datetime'])
-    df_tidy['date'] = df_tidy['datetime'].dt.date
-
-    pump_id = 1  # choose the pump you want
-    df_pump = df_tidy[df_tidy['pump'] == pump_id].copy()
-    df_pump['datetime'] = pd.to_datetime(df_pump['datetime'])
-
-    # Set datetime as index for resampling
-    df_pump.set_index('datetime', inplace=True)
-
-    # Resample by week, get first and last cumulative values
-    weekly = df_pump['TOTAL_GAL'].resample('W').agg(['first', 'last'])
-    # Actual pumped volume
-    weekly['weekly_volume'] = (weekly['last'] - weekly['first']).clip(lower=0)
-    weekly = weekly.reset_index()
-
-    bar_chart = alt.Chart(weekly).mark_bar().encode(
-        x='datetime:T',
-        y='weekly_volume:Q',
-        tooltip=['datetime', 'weekly_volume']
-    )
-
-    st.altair_chart(bar_chart, use_container_width=True)
-
-    line_chart = alt.Chart(weekly).mark_line(point=True).encode(
-        x='datetime:T',           # time on x-axis
-        y='weekly_volume:Q',      # pumped volume on y-axis
-        tooltip=['datetime', 'weekly_volume']).properties(title=f'Weekly Pumped Volume for Pump {pump_id}').interactive()  # allows zoom/pan
-
-    st.altair_chart(line_chart, use_container_width=True)
-
-
-
-
+###################################################################
 
     df_tidy['datetime'] = pd.to_datetime(df_tidy['datetime'])
-
     # Set datetime as index
     df_tidy_indexed = df_tidy.set_index('datetime')
-
     # Group by pump and resample weekly
-    weekly = (
-        df_tidy_indexed.groupby('pump')['TOTAL_GAL']
-        .resample('W')  # weekly frequency
+    weekly = (df_tidy_indexed.groupby('pump')['TOTAL_GAL'].resample('W')  # weekly frequency
         .agg(first='first', last='last')
         .reset_index()  # bring 'pump' back as column
-    )
+)   
+    
 
-    # Compute actual weekly pumped volume
     weekly['weekly_volume'] = (weekly['last'] - weekly['first']).clip(lower=0)
 
-
     pump_options = sorted(df_tidy['pump'].unique())
-    selected_pumps = st.multiselect("Select Pumps", pump_options, default=[pump_options[0]])
+    selected_pump = st.selectbox("Select Pump", pump_options, key="b")
 
-    weekly_filtered = weekly[weekly['pump'].isin(selected_pumps)]
+    weekly_filtered = weekly[weekly['pump'] == (selected_pump)]
 
-    line_chart = alt.Chart(weekly_filtered).mark_line(point=True).encode(
+    bar_chart = alt.Chart(weekly_filtered).mark_bar(point=True).encode(
+        x='datetime:T',
+        y='weekly_volume:Q',
+        color='pump:N',
+        tooltip=['pump', 'datetime', 'weekly_volume']).interactive()
+    st.altair_chart(bar_chart, width='stretch')
+
+    pump_options1 = sorted(df_tidy['pump'].unique())
+    selected_pumps1 = st.multiselect("Select Pumps", pump_options1, default=[pump_options1[0]])
+    # weekly_filtered1 = weekly[weekly['pump'].isin(selected_pumps1)]
+    # line_chart = alt.Chart(weekly_filtered1).mark_line(point=True).encode(
+    #     x='datetime:T',
+    #     y='weekly_volume:Q',
+    #     color='pump:N',
+    #     tooltip=['pump', 'datetime', 'weekly_volume']).interactive()
+
+    # st.altair_chart(line_chart, width='stretch')
+
+    # Date slider
+    min_date = weekly['datetime'].min().date()
+    max_date = weekly['datetime'].max().date()
+    start_date, end_date = st.slider(
+        "Select date range",
+        min_value=min_date,
+        max_value=max_date,
+        value=(min_date, max_date)
+    )
+
+    # Filter the data
+    weekly_filtered1 = weekly[
+        (weekly['pump'].isin(selected_pumps1)) &
+        (weekly['datetime'].dt.date >= start_date) &
+        (weekly['datetime'].dt.date <= end_date)
+    ]
+
+    # Plot
+    line_chart = alt.Chart(weekly_filtered1).mark_line(point=True).encode(
         x='datetime:T',
         y='weekly_volume:Q',
         color='pump:N',
         tooltip=['pump', 'datetime', 'weekly_volume']
     ).interactive()
 
-    st.altair_chart(line_chart, use_container_width=True)
+    st.altair_chart(line_chart, width='stretch')
+
     # # =========================
     # # 🔹 STREAMLIT UI
     # # =========================

@@ -263,17 +263,6 @@ for i in range(0, len(wells_list), COLS):
         # Derived values
         speed = get_animation_speed(gpm)   # Your function
         status, color = get_status(gpm)    # Your function
-        # total = well.total
-        # print(total, i, j)
-        # if well.total is not None:
-        #     total = well.total
-        # else:
-        #     count = 1
-        #     while total is None:
-        #         total = wells_list[(i + j) - count].total
-        #         count += 1
-        #         print(well.total)
-        #     print("total: ", (total), i, j,  gpm, total)
 
         with col:
             with st.container(border=True):
@@ -297,12 +286,7 @@ for i in range(0, len(wells_list), COLS):
 
                 # Lottie animation
                 if gpm is not None:
-                    st_lottie(
-                        lottie_water,
-                        height=80,
-                        speed=speed,
-                        key=f"lottie_{well.well_id}"
-                    )
+                    st_lottie(lottie_water, height=80, speed=speed, key=f"lottie_{well.well_id}")
 
                 if gpm is None:
                     pass
