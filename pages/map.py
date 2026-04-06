@@ -5,6 +5,8 @@ st.title("Site Map")
 
 st.write("Map placeholder — add well coordinates later.")
 
+st.write("This page is under devlopment ... ")
+
 # Example dummy map data
 data = pd.DataFrame({
     "lat": [41.626759],

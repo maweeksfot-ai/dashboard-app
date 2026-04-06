@@ -1,15 +1,15 @@
 import streamlit as st
-from PIL import Image
+# from PIL import Image
 import numpy as np
-import cv2
-import pytesseract
-import easyocr
+# import cv2
+# import pytesseract
+# import easyocr
 
 
-reader = easyocr.Reader(['en'], gpu=False)
+# reader = easyocr.Reader(['en'], gpu=False)
 
 # Windows example
-pytesseract.pytesseract.tesseract_cmd = r"C://Program Files//Tesseract-OCR//tesseract.exe"
+# pytesseract.pytesseract.tesseract_cmd = r"C://Program Files//Tesseract-OCR//tesseract.exe"
 
 
 # -------------------- Streamlit UI --------------------
@@ -27,54 +27,54 @@ camera_pic = st.camera_input("Take a photo")
 uploaded_file = st.file_uploader("Or upload an existing image", type=None)  # allow HEIC, PNG, JPG, JPEG
 
 # ---- SELECT IMAGE ----
-image = None
-if camera_pic is not None:
-    image = Image.open(camera_pic)
-elif uploaded_file is not None:
-    image = Image.open(uploaded_file)
+# image = None
+# if camera_pic is not None:
+#     image = Image.open(camera_pic)
+# elif uploaded_file is not None:
+#     image = Image.open(uploaded_file)
 
-if image is not None:
-    st.subheader("Input Image")
-    st.image(image, use_column_width=True)
+# if image is not None:
+#     st.subheader("Input Image")
+#     st.image(image, use_column_width=True)
 
-    # -------------------- Preprocessing --------------------
+#     # -------------------- Preprocessing --------------------
 
-    img_cv = np.array(image)
+#     img_cv = np.array(image)
 
-    # --- ROI crop (tune this!) ---
-    h, w = img_cv.shape[:2]
-    roi = img_cv[int(h*0.35):int(h*0.75), int(w*0.15):int(w*0.85)]
+#     # --- ROI crop (tune this!) ---
+#     h, w = img_cv.shape[:2]
+#     roi = img_cv[int(h*0.35):int(h*0.75), int(w*0.15):int(w*0.85)]
 
-    # --- grayscale ---
-    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+#     # --- grayscale ---
+#     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
 
-    # --- contrast enhancement ---
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-    gray = clahe.apply(gray)
+#     # --- contrast enhancement ---
+#     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+#     gray = clahe.apply(gray)
 
-    # --- threshold ---
-    _, thresh = cv2.threshold(gray, 0, 255,
-                            cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+#     # --- threshold ---
+#     _, thresh = cv2.threshold(gray, 0, 255,
+#                             cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
-    # --- morphology ---
-    kernel = np.ones((3,3), np.uint8)
-    processed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+#     # --- morphology ---
+#     kernel = np.ones((3,3), np.uint8)
+#     processed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
 
-    # --- resize ---
-    resized = cv2.resize(processed, None, fx=2.5, fy=2.5, interpolation=cv2.INTER_CUBIC)
+#     # --- resize ---
+#     resized = cv2.resize(processed, None, fx=2.5, fy=2.5, interpolation=cv2.INTER_CUBIC)
 
-    results = reader.readtext(resized, detail=1)
+#     results = reader.readtext(resized, detail=1)
 
-    # Extract only numbers
-    numbers = []
-    for (bbox, text, prob) in results:
-        cleaned = ''.join([c for c in text if c in '0123456789.'])
-        if cleaned:
-            numbers.append((cleaned, prob))
+#     # Extract only numbers
+#     numbers = []
+#     for (bbox, text, prob) in results:
+#         cleaned = ''.join([c for c in text if c in '0123456789.'])
+#         if cleaned:
+#             numbers.append((cleaned, prob))
 
-    st.subheader("Extracted Numbers (EasyOCR)")
-    for num, prob in numbers:
-        st.write(f"{num} (confidence: {prob:.2f})")
+#     st.subheader("Extracted Numbers (EasyOCR)")
+#     for num, prob in numbers:
+#         st.write(f"{num} (confidence: {prob:.2f})")
 
     # -------------------- Save Processed Image --------------------
 
