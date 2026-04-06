@@ -13,14 +13,14 @@ columns1 = ['Date', 'Time', 'GPM_1', 'TOTAL_GAL_1', 'GPM_2','TOTAL_GAL_2', 'GPM_
 columns2 = ['Date', 'Time','GPM_25', 'TOTAL_GAL_25', 'GPM_26','TOTAL_GAL_26','GPM_27', 'TOTAL_GAL_27', 'GPM_28','TOTAL_GAL_28', 'GPM_29', 'TOTAL_GAL_29', 'GPM_30','TOTAL_GAL_30', 'GPM_31', 'TOTAL_GAL_31', 'GPM_32', 'TOTAL_GAL_32', 'GPM_33','TOTAL_GAL_33', 'GPM_34', 'TOTAL_GAL_34', 'GPM_35', 'TOTAL_GAL_35', 'GPM_36','TOTAL_GAL_36', 'GPM_37', 'TOTAL_GAL_37', 'GPM_38', 'TOTAL_GAL_38', 'GPM_39','TOTAL_GAL_39', 'GPM_40', 'TOTAL_GAL_40', 'GPM_41', 'TOTAL_GAL_41','GPM_42', 'TOTAL_GAL_42', 'GPM_43', 'TOTAL_GAL_43', 'GPM_44','TOTAL_GAL_44', 'GPM_45', 'TOTAL_GAL_45', 'GPM_101', 'TOTAL_GAL_101','GPM_102', 'TOTAL_GAL_102', 'GPM_103', 'TOTAL_GAL_103', 'GPM_104','TOTAL_GAL_104', 'GPM_105', 'TOTAL_GAL_105', 'GPM_106', 'TOTAL_GAL_106','GPM_107', 'TOTAL_GAL_107', 'comments', 'datetime']
 
 if "df_tidy" not in st.session_state:
-    st.session_state.df_tidy = load_all_data(live_urls, columns1, columns2)
+    st.session_state.df_tidy, st.session_state.df_combined = load_all_data(live_urls, columns1, columns2)
 
 if st.button("Refresh Data"):
     load_all_data.clear()  # clear cache
-    st.session_state.df_tidy = load_all_data(live_urls, columns1, columns2)
+    st.session_state.df_tidy, st.session_state.df_combined = load_all_data(live_urls, columns1, columns2)
 
 df_tidy = st.session_state.df_tidy
-df_combined = st.session_state.df_tidy
+df_combined = st.session_state.df_combined
 
 st.set_page_config(page_title="Dewatering Dashboard", layout="wide")
 

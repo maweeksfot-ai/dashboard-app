@@ -113,4 +113,4 @@ def load_all_data(live_urls, columns1, columns2):
     df_combined = merge_and_sort(df1, df2)
     df_tidy = make_tidy(df_combined)
 
-    return df_tidy
+    return df_tidy, df_combined
