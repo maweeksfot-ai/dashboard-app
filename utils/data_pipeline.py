@@ -61,7 +61,7 @@ def drop_DT(df):
     df = df.drop(columns=['Date', 'Time'], errors='ignore')
     return df
 
-@st.cache_data()
+# @st.cache_data()
 def merge_and_sort(df1, df2):
     df_merged = pd.merge(df1, df2, on='datetime', how='outer', suffixes=('_1', '_2'))
     df_merged.sort_values('datetime', inplace=True)
@@ -69,7 +69,7 @@ def merge_and_sort(df1, df2):
     df_merged = df_merged.drop(columns=['comments_1', 'comments_2'], errors='ignore')
     return df_merged
 
-@st.cache_data()
+# @st.cache_data()
 def make_tidy(df):
 
     value_cols = [col for col in df.columns if 'GPM_' in col or 'TOTAL_GAL_' in col]
@@ -93,7 +93,7 @@ def make_tidy(df):
     df_tidy.columns.name = None
     return df_tidy
 
-@st.cache_data()
+# @st.cache_data()
 def run_functions(url, list):
     df = get_data(url)
     df = shape_df(df)
