@@ -5,6 +5,8 @@ from utils.tow_pipeline import run_functions
 from utils.data_pipeline import load_all_data
 
 
+st.set_page_config(layout="wide")
+
 # -----------------------------
 # Load data once into session_state
 # -----------------------------
@@ -68,7 +70,7 @@ if 'selected_tows' not in st.session_state:
 selected_tows = st.multiselect(
     "Select TOWs to display",
     options=tow_options,
-    default=st.session_state.selected_tows,
+    default=st.session_state.selected_tows[0],
     key='tow_multiselect'
 )
 st.session_state.selected_tows = selected_tows
