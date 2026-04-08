@@ -21,9 +21,7 @@ columns2 = ['Date', 'Time','GPM_25', 'TOTAL_GAL_25', 'GPM_26','TOTAL_GAL_26','GP
 if st.button("Refresh Data"):
     load_all_data.clear()
 
-st.session_state.df_tidy, st.session_state.df_combined = load_all_data(
-    live_urls, columns1, columns2
-)
+st.session_state.df_tidy, st.session_state.df_combined = load_all_data(live_urls, columns1, columns2)
 
 
 df_tidy = st.session_state.df_tidy

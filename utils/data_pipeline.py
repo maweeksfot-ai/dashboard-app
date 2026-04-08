@@ -107,10 +107,12 @@ def run_functions(url, list):
     return df
 
 @st.cache_data()
-def load_all_data(live_urls, columns1, columns2):
+def load_all_data(live_urls=live_urls, columns1=columns1, columns2=columns2):
     df1 = run_functions(live_urls[0], columns1)
     df2 = run_functions(live_urls[1], columns2)
     df_combined = merge_and_sort(df1, df2)
     df_tidy = make_tidy(df_combined)
 
     return df_tidy, df_combined
+
+df_tidy, df_combined = load_all_data()
