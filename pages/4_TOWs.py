@@ -55,6 +55,36 @@ df_wide = st.session_state.df_wide
 
 st.header("TOW Analytics")
 
+
+df_long['datetime'] = pd.to_datetime(df_long['datetime'])
+df_wide['datetime'] = pd.to_datetime(df_long['datetime'])
+
+st.header("TOW Levels")
+tow = st.selectbox('Select TOW', sorted(df_long['tow'].unique()))
+filtered = df_long[df_long['tow'] == tow]
+st.line_chart(filtered.set_index('datetime')['value'])
+
+
+st.header("TOW Comparison")
+# Example: resample to hourly means
+df_slim = df_long.set_index('datetime').groupby('tow', group_keys=False).resample('1D').mean().reset_index()
+tows = sorted(df_slim['tow'].unique())
+tow_options = tows
+selected_tows = st.multiselect("Select TOWS", tow_options, default=[tow_options[0]])
+
+filtered_tows = df_slim[df_slim['tow'].isin(selected_tows)]
+line_chart = alt.Chart(filtered_tows).mark_line(point=True).encode(
+    x='datetime:T',
+    y='value:Q',
+    color='tow:N',
+    tooltip=['tow', 'datetime']
+).interactive()
+
+st.altair_chart(line_chart, width='stretch')
+
+
+# df_long['current_elevation'] = df_long['tow'].map(toc_elev) - df_long['value']
+
 depth = ((df_long[df_long['value'].notna()]).sort_values('datetime').groupby('tow', as_index=False).last())
 
 depth = depth.set_index('tow')
@@ -118,38 +148,6 @@ chart = line + thresholds
 st.altair_chart(chart, use_container_width=True)
 
 #### END OF TOW PHASE LOGIC
-
-
-df_long['datetime'] = pd.to_datetime(df_long['datetime'])
-df_wide['datetime'] = pd.to_datetime(df_long['datetime'])
-
-st.header("TOW Levels")
-tow = st.selectbox('Select TOW', sorted(df_long['tow'].unique()))
-filtered = df_long[df_long['tow'] == tow]
-st.line_chart(filtered.set_index('datetime')['value'])
-
-
-st.header("TOW Comparison")
-# Example: resample to hourly means
-df_slim = df_long.set_index('datetime').groupby('tow', group_keys=False).resample('1D').mean().reset_index()
-tows = sorted(df_slim['tow'].unique())
-tow_options = tows
-selected_tows = st.multiselect("Select TOWS", tow_options, default=[tow_options[0]])
-
-filtered_tows = df_slim[df_slim['tow'].isin(selected_tows)]
-line_chart = alt.Chart(filtered_tows).mark_line(point=True).encode(
-    x='datetime:T',
-    y='value:Q',
-    color='tow:N',
-    tooltip=['tow', 'datetime']
-).interactive()
-
-st.altair_chart(line_chart, width='stretch')
-
-
-# df_long['current_elevation'] = df_long['tow'].map(toc_elev) - df_long['value']
-
-
 
 st.dataframe(df_wide.tail(12))
 
