@@ -67,8 +67,8 @@ st.line_chart(filtered.set_index('datetime')['value'])
 
 st.header("TOW Comparison")
 # Example: resample to hourly means
+tows = sorted(df_long['tow'].unique())
 df_slim = df_long.set_index('datetime').groupby('tow', group_keys=False).resample('1D').mean().reset_index()
-tows = sorted(df_slim['tow'].unique())
 tow_options = tows
 selected_tows = st.multiselect("Select TOWS", tow_options, default=[tow_options[0]])
 
