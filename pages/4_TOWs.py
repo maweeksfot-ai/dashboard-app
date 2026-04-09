@@ -72,7 +72,7 @@ df_slim = df_long.set_index('datetime').groupby('tow', group_keys=False).resampl
 tow_options = tows
 selected_tows = st.multiselect("Select TOWS", tow_options, default=[tow_options[0]])
 
-filtered_tows = df_slim[df_slim['tow'].isin(selected_tows)]
+filtered_tows = df_slim[df_long['tow'].isin(selected_tows)]
 line_chart = alt.Chart(filtered_tows).mark_line(point=True).encode(
     x='datetime:T',
     y='value:Q',
